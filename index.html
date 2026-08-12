@@ -1133,6 +1133,9 @@ const PARENT_METRIC_UNITS = {
   b10:'kg', s10:'kg', d10:'kg', med:'m', s10m:'秒', s30m:'秒', triple:'m', ffm:'kg', ffmi:''
 };
 let parentChart = null;
+let parentActiveMetric = null;
+let parentMiniCharts = {};
+let parentReportsData = [];
 
 function showParentLogin() {
   document.getElementById('login-screen').style.display = 'none';
@@ -1194,14 +1197,25 @@ function renderParentView(data) {
     document.getElementById('pv-rank-sub').textContent = 'まだ順位データがありません';
   }
 
-  // 歴代ベスト一覧
+  // 歴代ベスト一覧（選手が報告した全種目。クリックで推移グラフを開閉）
   const best = data.bestRecord || {};
+  parentReportsData = (data.reports || []).slice().sort((a,b) => new Date(a.date) - new Date(b.date));
   const list = document.getElementById('pv-metric-list');
-  const keys = Object.keys(PARENT_METRIC_LABELS).filter(k => best[k] !== undefined);
+  const keys = Object.keys(PARENT_METRIC_LABELS).filter(k => best[k] !== undefined || parentReportsData.some(r => r[k] !== undefined && r[k] !== '' && r[k] !== null));
   list.innerHTML = keys.length ? keys.map(k => `
-    <div class="settings-row">
-      <div class="settings-label">${PARENT_METRIC_LABELS[k]}</div>
-      <div class="settings-val">${best[k]}${PARENT_METRIC_UNITS[k] || ''}</div>
+    <div class="metric-item-wrapper" id="pv-item-${k}" style="border-color: transparent;">
+      <div class="metric-row-clickable" onclick="togglePvMetricChart('${k}')">
+        <div class="metric-label-group">
+          <span class="metric-name" style="font-size: 11px; color: var(--muted); font-weight: 600;">${PARENT_METRIC_LABELS[k]}</span>
+          <span class="metric-val" style="font-size: 20px; font-weight: 700; color: var(--accent); margin-top:2px;">${best[k] !== undefined ? best[k] + (PARENT_METRIC_UNITS[k] || '') : '--'}</span>
+        </div>
+        <span style="font-size: 11px; color: var(--muted); padding-right: 4px;" id="pv-arrow-${k}">▶</span>
+      </div>
+      <div class="inline-chart-container" id="pv-chart-area-${k}">
+        <div style="position:relative; width:100%; height:160px;">
+          <canvas id="pv-canvas-${k}"></canvas>
+        </div>
+      </div>
     </div>`).join('') : '<div style="color:var(--muted);font-size:13px;padding:10px 4px;">まだデータがありません</div>';
 
   // 総合指数推移（本人の報告データのみを使って算出。他選手のデータは一切扱わない）
@@ -1223,10 +1237,51 @@ function renderParentView(data) {
 
 function parentLogout() {
   if (parentChart) { parentChart.destroy(); parentChart = null; }
+  Object.values(parentMiniCharts).forEach(c => c.destroy());
+  parentMiniCharts = {};
+  parentActiveMetric = null;
+  parentReportsData = [];
   document.getElementById('parent-app').style.display = 'none';
   document.getElementById('pl-name').value = '';
   document.getElementById('pl-code').value = '';
   hideParentLogin();
+}
+
+// 種目別の推移グラフを開閉（本人の報告データのみ使用。他選手のデータは扱わない）
+function togglePvMetricChart(metricId) {
+  const area = document.getElementById(`pv-chart-area-${metricId}`);
+  const arrow = document.getElementById(`pv-arrow-${metricId}`);
+  const isOpen = area.classList.contains('active');
+
+  if (parentActiveMetric && parentActiveMetric !== metricId) {
+    const prevArea = document.getElementById(`pv-chart-area-${parentActiveMetric}`);
+    const prevArrow = document.getElementById(`pv-arrow-${parentActiveMetric}`);
+    if (prevArea) prevArea.classList.remove('active');
+    if (prevArrow) prevArrow.textContent = '▶';
+  }
+
+  if (isOpen) {
+    area.classList.remove('active');
+    arrow.textContent = '▶';
+    parentActiveMetric = null;
+    return;
+  }
+
+  area.classList.add('active');
+  arrow.textContent = '▼';
+  parentActiveMetric = metricId;
+
+  const rows = parentReportsData.filter(r => r[metricId] !== undefined && r[metricId] !== '' && r[metricId] !== null);
+  const dates = rows.map(r => r.date.slice(5));
+  const values = rows.map(r => parseFloat(r[metricId]));
+
+  const ctx = document.getElementById(`pv-canvas-${metricId}`).getContext('2d');
+  if (parentMiniCharts[metricId]) parentMiniCharts[metricId].destroy();
+  parentMiniCharts[metricId] = new Chart(ctx, {
+    type: 'line',
+    data: { labels: dates, datasets: [{ label: PARENT_METRIC_LABELS[metricId], data: values, borderColor: '#47c8ff', backgroundColor: 'rgba(71,200,255,0.05)', borderWidth: 2, tension: 0.1, spanGaps: true, pointRadius: 3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { color: 'rgba(255,255,255,0.02)' }, ticks: { color: '#778899', font: { size: 8 }, maxTicksLimit: 8 } }, y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#778899', font: { size: 9 } } } } }
+  });
 }
 
 async function loadReportsInBackground() {
