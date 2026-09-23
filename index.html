@@ -313,20 +313,18 @@
             <option value="">👥 チーム全体</option>
           </select>
           <select class="filter-sel" id="rank-event" onchange="renderRanking()">
-            <option value="composite">🏆 総合指数</option>
             <option value="bench1rm">ベンチプレス 1RM</option>
             <option value="bench10rm">ベンチプレス 10RM</option>
             <option value="squat1rm">スクワット 1RM</option>
             <option value="squat10rm">スクワット 10RM</option>
-            <option value="dead1rm">デッドリフト 1RM</option>
-            <option value="dead10rm">デッドリフト 10RM</option>
             <option value="pulldown">プルダウン</option>
             <option value="batspeed">バットスピード</option>
-            <option value="chinups">懸垂</option>
             <option value="sprint10">10m走</option>
             <option value="sprint30">30m走</option>
-            <option value="triplejump">三段跳び</option>
-            <option value="medicine">メディシン</option>
+            <option value="triplejump">三段跳び(両足)</option>
+            <option value="medicine">メディシン バックスロー</option>
+            <option value="medicineoh">メディシン オーバーヘッドスロー</option>
+            <option value="verticaljump">垂直跳び</option>
             <option value="height">身長</option>
             <option value="weight">体重</option>
             <option value="ffm">除脂肪体重</option>
@@ -395,11 +393,6 @@
             <div style="font-size:24px;font-weight:700;color:var(--accent2);" id="prof-weight">--</div>
             <div style="font-size:11px;color:var(--muted);">kg</div>
           </div>
-          <div style="background:rgba(232,255,71,0.08);border:0.5px solid rgba(232,255,71,0.3);border-radius:8px;padding:10px 16px;flex:1;min-width:120px;">
-            <div style="font-size:11px;color:var(--accent);">筋トレのランク</div>
-            <div style="font-size:24px;font-weight:700;color:var(--accent);" id="prof-rank-label">--</div>
-            <div style="font-size:11px;color:var(--muted);" id="prof-total-score">総合指数: --点</div>
-          </div>
         </div>
       </div>
       <div class="profile-container">
@@ -466,14 +459,6 @@
             <input type="number" class="form-input" id="f-s1" placeholder="目標: 200" step="0.5">
           </div>
           <div class="form-group">
-            <label class="form-label">デッドリフト 1RM (kg)</label>
-            <input type="number" class="form-input" id="f-d1" placeholder="目標: 250" step="0.5">
-          </div>
-          <div class="form-group">
-            <label class="form-label">懸垂 (回)</label>
-            <input type="number" class="form-input" id="f-chin" placeholder="目標: 20" step="1">
-          </div>
-          <div class="form-group">
             <label class="form-label">ベンチプレス 10RM (kg)</label>
             <input type="number" class="form-input" id="f-b10" placeholder="目標: 75" step="0.5">
           </div>
@@ -482,12 +467,16 @@
             <input type="number" class="form-input" id="f-s10" placeholder="目標: 150" step="0.5">
           </div>
           <div class="form-group">
-            <label class="form-label">デッドリフト 10RM (kg)</label>
-            <input type="number" class="form-input" id="f-d10" placeholder="目標: 185" step="0.5">
-          </div>
-          <div class="form-group">
             <label class="form-label">メディシン バックスロー (m)</label>
             <input type="number" class="form-input" id="f-med" placeholder="目標: 17" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">メディシン オーバーヘッドスロー (m)</label>
+            <input type="number" class="form-input" id="f-medoh" placeholder="目標: 10" step="0.1">
+          </div>
+          <div class="form-group">
+            <label class="form-label">垂直跳び (cm)</label>
+            <input type="number" class="form-input" id="f-vert" placeholder="目標: 60" step="0.5">
           </div>
           <div class="form-group">
             <label class="form-label">10m走 (秒)</label>
@@ -498,7 +487,7 @@
             <input type="number" class="form-input" id="f-30m" placeholder="目標: 4.40" step="0.01">
           </div>
           <div class="form-group">
-            <label class="form-label">三段跳び (m)</label>
+            <label class="form-label">三段跳び(両足) (m)</label>
             <input type="number" class="form-input" id="f-triple" placeholder="目標: 7.5" step="0.01">
           </div>
           <div class="form-group full">
@@ -721,7 +710,7 @@
 </div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwI1xZR0snIbyH_qoNRzLFbPKFuanfD8S0mAKRZl886fmmz9zb8oy25cGyzs3MQsHsrHA/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycby9i3wMWpXkVFhjGmc1xWDABB5cQgFDRccEIpWItzFm9EyA0pkd9K4QNpIYL0AOb2Njpw/exec';
 
 let currentUser = null;
 let teamMembers = [];
@@ -763,8 +752,8 @@ function effectiveConfigMap(name) {
 }
 
 const avatarColors = ['#e8ff47','#47c8ff','#ff4757','#2ed573','#ffa502','#a29bfe','#fd79a8','#fdcb6e','#74b9ff','#55efc4','#e17055','#b2bec3'];
-const units = {bench1rm:'kg',bench10rm:'kg',squat1rm:'kg',squat10rm:'kg',dead1rm:'kg',dead10rm:'kg',pulldown:'km/h',batspeed:'km/h',chinups:'回',sprint10:'秒',sprint30:'秒',triplejump:'m',medicine:'m',height:'cm',weight:'kg',ffm:'kg',ffmi:'',composite:'点'};
-const eventMap = {bench1rm:'b1',bench10rm:'b10',squat1rm:'s1',squat10rm:'s10',dead1rm:'d1',dead10rm:'d10',pulldown:'pull',batspeed:'bat',chinups:'chin',sprint10:'s10m',sprint30:'s30m',triplejump:'triple',medicine:'med',height:'height',weight:'weight',ffm:'ffm',ffmi:'ffmi'};
+const units = {bench1rm:'kg',bench10rm:'kg',squat1rm:'kg',squat10rm:'kg',pulldown:'km/h',batspeed:'km/h',sprint10:'秒',sprint30:'秒',triplejump:'m',medicine:'m',medicineoh:'m',verticaljump:'cm',height:'cm',weight:'kg',ffm:'kg',ffmi:''};
+const eventMap = {bench1rm:'b1',bench10rm:'b10',squat1rm:'s1',squat10rm:'s10',pulldown:'pull',batspeed:'bat',sprint10:'s10m',sprint30:'s30m',triplejump:'triple',medicine:'med',medicineoh:'medoh',verticaljump:'vert',height:'height',weight:'weight',ffm:'ffm',ffmi:'ffmi'};
 
 // 【完全修復】依存関係のあるすべての関数を下部から参照できるよう、JavaScriptトップレベルに定義
 function getMetricColorClassAndHex(metricId, currentValue) {
@@ -819,7 +808,6 @@ function handleRankGroupChange() {
 
 function renderRanking() {
   const event = document.getElementById('rank-event').value;
-  if (event === 'composite') { renderCompositeRanking(); return; }
   const apiKey = eventMap[event];
   const isTime = event === 'sprint30' || event === 'sprint10';
   let ranks = [];
@@ -852,39 +840,6 @@ function renderRanking() {
   }).join('');
 }
 
-// 総合指数：個人票と同じ計算式(ベンチ10RM*1.5625 + スクワット10RM*0.8333 + デッド10RM*0.75 + 懸垂*5)
-// 歴代ベスト記録(allBestRecords)を元に算出する
-function calcCompositeScore(name) {
-  const best = allBestRecords[name] || {};
-  const bp10 = best['b10'] || 0; const sq10 = best['s10'] || 0; const dl10 = best['d10'] || 0; const chin = best['chin'] || 0;
-  if (!bp10 && !sq10 && !dl10 && !chin) return null;
-  return (bp10 * 1.5625) + (sq10 * 0.8333333) + (dl10 * 0.75) + (chin * 5);
-}
-
-function renderCompositeRanking() {
-  let ranks = [];
-  getRankingTargetMembers().forEach(name => {
-    const score = calcCompositeScore(name);
-    if (score !== null) ranks.push({ n: name, v: parseFloat(score.toFixed(1)) });
-  });
-  ranks.sort((a,b) => b.v - a.v); // 総合指数は高いほど優秀
-
-  const tbody = document.getElementById('rank-body');
-  if (ranks.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:var(--muted);">対象のデータがありません</td></tr>`;
-    return;
-  }
-  tbody.innerHTML = ranks.map((row,i) => {
-    const rankClass = i===0?'r1':i===1?'r2':i===2?'r3':'r-other';
-    const rankText = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
-    return `<tr>
-      <td><span class="rank-num ${rankClass}">${rankText}</span></td>
-      <td><strong style="color:#eef;">${displayName(row.n)}</strong></td>
-      <td style="font-size:15px;font-weight:700;color:var(--accent);">${row.v}${units.composite}</td>
-    </tr>`;
-  }).join('');
-}
-
 function renderInlineChart(metricId) {
   const targetName = currentUser.role === '指導者' ? selectedPlayerForCoach : currentUser.name;
   const canvasElement = document.getElementById(`canvas-${metricId}`); if (!targetName || !canvasElement) return;
@@ -897,13 +852,7 @@ function renderInlineChart(metricId) {
     let rangeDays = parseInt(activeChartRange);
     for (let i = rangeDays - 1; i >= 0; i--) { dates.push(new Date(nowJST.getTime() - (i * 24 * 60 * 60 * 1000)).toISOString().split('T')[0]); }
   }
-  // 総合指数(composite)は b10/s10/d10/chin の重み付き合計をその日の入力値から算出
   const getMetricValue = (r) => {
-    if (metricId === 'composite') {
-      const b10 = parseFloat(r['b10']), s10 = parseFloat(r['s10']), d10 = parseFloat(r['d10']), chin = parseFloat(r['chin']);
-      if (isNaN(b10) && isNaN(s10) && isNaN(d10) && isNaN(chin)) return null;
-      return (b10||0)*1.5625 + (s10||0)*0.8333333 + (d10||0)*0.75 + (chin||0)*5;
-    }
     return (r[metricId] !== "" && r[metricId] !== undefined) ? parseFloat(r[metricId]) : null;
   };
   const playerData = dates.map(date => {
@@ -914,12 +863,6 @@ function renderInlineChart(metricId) {
   });
   // チームの歴代最高値の中央値(引退選手除く)
   const teamBestValues = teamMembers.map(name => {
-    if (metricId === 'composite') {
-      const best = allBestRecords[name] || {};
-      const b10 = best['b10']||0, s10 = best['s10']||0, d10 = best['d10']||0, chin = best['chin']||0;
-      if (!b10 && !s10 && !d10 && !chin) return null;
-      return b10*1.5625 + s10*0.8333333 + d10*0.75 + chin*5;
-    }
     const v = (allBestRecords[name] || {})[metricId];
     return (v !== undefined && v !== null && v !== '') ? parseFloat(v) : null;
   }).filter(v => v !== null).sort((a,b) => a - b);
@@ -977,29 +920,21 @@ function updateProfile() {
     if (recentReports.length === 0) return true; 
     return !recentReports.some(r => parseFloat(r[key]) === bestVal);
   };
-  let bp10 = getBest('b10') || 0; let sq10 = getBest('s10') || 0; let dl10 = getBest('d10') || 0; let chin = getBest('chin') || 0;
-  let totalScore = (bp10 * 1.5625) + (sq10 * 0.8333333) + (dl10 * 0.75) + (chin * 5);
-  let rankStr = 'D'; let rankDescStr = '発展途上・トレーニング開始期（1年生レベル）';
-  if (totalScore >= 500) { rankStr = 'S'; rankDescStr = '全国上位・フィジカル突出（プロ・スカウト対象）'; }
-  else if (totalScore >= 420) { rankStr = 'A'; rankDescStr = '強豪校主力クラス（県上位・私学レギュラー級）'; }
-  else if (totalScore >= 340) { rankStr = 'B'; rankDescStr = '県上位レギュラー争い・一般部員の上位層'; }
-  else if (totalScore >= 260) { rankStr = 'C'; rankDescStr = '平均的な高校球児（一般的な公立校レベル）'; }
-  document.getElementById('prof-rank-label').textContent = rankStr;
-  document.getElementById('prof-total-score').textContent = `総合指数: ${totalScore.toFixed(1)}点`;
-  document.getElementById('prof-sub-id').textContent = `身長 ${latestHeight}cm / ${rankDescStr}`;
+  document.getElementById('prof-sub-id').textContent = `身長 ${latestHeight}cm`;
   const metrics = [
-    { id: 'composite', label: '総合指数', val: totalScore ? totalScore.toFixed(1) + '点' : '--', stag: false, raw: totalScore || null },
     { id: 'weight', label: '体重', val: latestWeight !== '--' ? latestWeight + 'kg' : '--', stag: false, raw: latestWeight !== '--' ? parseFloat(latestWeight) : null },
     { id: 'ffm', label: '除脂肪体重', val: getBest('ffm') ? getBest('ffm').toFixed(1) + 'kg' : '--', stag: isStagnantCustomDays('ffm'), raw: getBest('ffm') },
     { id: 'ffmi', label: '除脂肪指数', val: getBest('ffmi') ? getBest('ffmi').toFixed(1) : '--', stag: isStagnantCustomDays('ffmi'), raw: getBest('ffmi') },
+    { id: 'b1', label: 'ベンチ 1RM', val: getBest('b1') ? getBest('b1') + 'kg' : '--', stag: isStagnantCustomDays('b1'), raw: getBest('b1') },
     { id: 'b10', label: 'ベンチ 10RM', val: getBest('b10') ? getBest('b10') + 'kg' : '--', stag: isStagnantCustomDays('b10'), raw: getBest('b10') },
+    { id: 's1', label: 'スクワット 1RM', val: getBest('s1') ? getBest('s1') + 'kg' : '--', stag: isStagnantCustomDays('s1'), raw: getBest('s1') },
     { id: 's10', label: 'スクワット 10RM', val: getBest('s10') ? getBest('s10') + 'kg' : '--', stag: isStagnantCustomDays('s10'), raw: getBest('s10') },
-    { id: 'd10', label: 'デッドリフト 10RM', val: getBest('d10') ? getBest('d10') + 'kg' : '--', stag: isStagnantCustomDays('d10'), raw: getBest('d10') },
-    { id: 'chin', label: '懸垂', val: getBest('chin') ? getBest('chin') + '回' : '--', stag: isStagnantCustomDays('chin'), raw: getBest('chin') },
     { id: 'bat', label: 'バットスピード', val: getBest('bat') ? getBest('bat') + 'km/h' : '--', stag: isStagnantCustomDays('bat'), raw: getBest('bat') },
     { id: 'pull', label: 'プルダウン', val: getBest('pull') ? getBest('pull') + 'km/h' : '--', stag: isStagnantCustomDays('pull'), raw: getBest('pull') },
-    { id: 'med', label: 'メディシン投げ', val: getBest('med') ? getBest('med') + 'm' : '--', stag: isStagnantCustomDays('med'), raw: getBest('med') },
-    { id: 'triple', label: '三段跳び', val: getBest('triple') ? getBest('triple') + 'm' : '--', stag: isStagnantCustomDays('triple'), raw: getBest('triple') },
+    { id: 'med', label: 'メディシン バックスロー', val: getBest('med') ? getBest('med') + 'm' : '--', stag: isStagnantCustomDays('med'), raw: getBest('med') },
+    { id: 'medoh', label: 'メディシン オーバーヘッドスロー', val: getBest('medoh') ? getBest('medoh') + 'm' : '--', stag: isStagnantCustomDays('medoh'), raw: getBest('medoh') },
+    { id: 'vert', label: '垂直跳び', val: getBest('vert') ? getBest('vert') + 'cm' : '--', stag: isStagnantCustomDays('vert'), raw: getBest('vert') },
+    { id: 'triple', label: '三段跳び(両足)', val: getBest('triple') ? getBest('triple') + 'm' : '--', stag: isStagnantCustomDays('triple'), raw: getBest('triple') },
     { id: 's10m', label: '10m走', val: getBest('s10m') ? getBest('s10m').toFixed(2) + '秒' : '--', stag: isStagnantCustomDays('s10m'), raw: getBest('s10m') },
     { id: 's30m', label: '30m走', val: getBest('s30m') ? getBest('s30m').toFixed(2) + '秒' : '--', stag: isStagnantCustomDays('s30m'), raw: getBest('s30m') }
   ];
@@ -1124,13 +1059,14 @@ async function attemptLogin() {
 // ========== 保護者用ログイン ==========
 const PARENT_METRIC_LABELS = {
   height:'身長', weight:'体重', bf:'体脂肪率', bat:'バットスピード', pull:'プルダウン',
-  b1:'ベンチプレス 1RM', s1:'スクワット 1RM', d1:'デッドリフト 1RM', chin:'懸垂',
-  b10:'ベンチプレス 10RM', s10:'スクワット 10RM', d10:'デッドリフト 10RM',
-  med:'メディシン投げ', s10m:'10m走', s30m:'30m走', triple:'三段跳び', ffm:'除脂肪体重', ffmi:'除脂肪指数'
+  b1:'ベンチプレス 1RM', s1:'スクワット 1RM',
+  b10:'ベンチプレス 10RM', s10:'スクワット 10RM',
+  med:'メディシン バックスロー', medoh:'メディシン オーバーヘッドスロー', vert:'垂直跳び',
+  s10m:'10m走', s30m:'30m走', triple:'三段跳び(両足)', ffm:'除脂肪体重', ffmi:'除脂肪指数'
 };
 const PARENT_METRIC_UNITS = {
-  height:'cm', weight:'kg', bf:'%', bat:'km/h', pull:'km/h', b1:'kg', s1:'kg', d1:'kg', chin:'回',
-  b10:'kg', s10:'kg', d10:'kg', med:'m', s10m:'秒', s30m:'秒', triple:'m', ffm:'kg', ffmi:''
+  height:'cm', weight:'kg', bf:'%', bat:'km/h', pull:'km/h', b1:'kg', s1:'kg',
+  b10:'kg', s10:'kg', med:'m', medoh:'m', vert:'cm', s10m:'秒', s30m:'秒', triple:'m', ffm:'kg', ffmi:''
 };
 let parentChart = null;
 let parentActiveMetric = null;
@@ -1421,12 +1357,11 @@ function updateFormPlaceholders() {
     { id: 'f-pull',   key: 'pull',   def: '目標: 140' },
     { id: 'f-b1',     key: 'b1',     def: '目標: 100' },
     { id: 'f-s1',     key: 's1',     def: '目標: 200' },
-    { id: 'f-d1',     key: 'd1',     def: '目標: 250' },
-    { id: 'f-chin',   key: 'chin',   def: '目標: 20' },
     { id: 'f-b10',    key: 'b10',    def: '目標: 80' },
     { id: 'f-s10',    key: 's10',    def: '目標: 150' },
-    { id: 'f-d10',    key: 'd10',    def: '目標: 185' },
     { id: 'f-med',    key: 'med',    def: '目標: 17' },
+    { id: 'f-medoh',  key: 'medoh',  def: '目標: 10' },
+    { id: 'f-vert',   key: 'vert',   def: '目標: 60' },
     { id: 'f-10m',    key: 's10m',   def: '目標: 1.80' },
     { id: 'f-30m',    key: 's30m',   def: '目標: 4.40' },
     { id: 'f-triple', key: 'triple', def: '目標: 7.5' }
@@ -1596,8 +1531,8 @@ function calcDerived() {
 }
 
 function validateFormInputs(payload) {
-  const fieldNamesMap = { height:'身長', weight:'体重', bf:'体脂肪率', bat:'バットスピード', pull:'プルダウン', b1:'ベンチプレス 1RM', s1:'スクワット 1RM', d1:'デッドリフト 1RM', chin:'懸垂', b10:'ベンチプレス 10RM', s10:'スクワット 10RM', d10:'デッドリフト 10RM', med:'メディシン投げ', s10m:'10m走', s30m:'30m走', triple:'三段跳び' };
-  const hardLimits = { height: {min:140,max:220}, weight: {min:40,max:180}, bf: {min:3,max:40}, bat: {min:70,max:200}, pull: {min:60,max:200}, b1: {min:20,max:300}, s1: {min:20,max:400}, d1: {min:20,max:450}, chin: {min:0,max:60}, b10: {min:10,max:250}, s10: {min:10,max:300}, d10: {min:10,max:350}, med: {min:3,max:30}, s10m: {min:1.0,max:3.0}, s30m: {min:3.0,max:6.5}, triple: {min:4,max:14} };
+  const fieldNamesMap = { height:'身長', weight:'体重', bf:'体脂肪率', bat:'バットスピード', pull:'プルダウン', b1:'ベンチプレス 1RM', s1:'スクワット 1RM', b10:'ベンチプレス 10RM', s10:'スクワット 10RM', med:'メディシン バックスロー', medoh:'メディシン オーバーヘッドスロー', vert:'垂直跳び', s10m:'10m走', s30m:'30m走', triple:'三段跳び(両足)' };
+  const hardLimits = { height: {min:140,max:220}, weight: {min:40,max:180}, bf: {min:3,max:40}, bat: {min:70,max:200}, pull: {min:60,max:200}, b1: {min:20,max:300}, s1: {min:20,max:400}, b10: {min:10,max:250}, s10: {min:10,max:300}, med: {min:3,max:30}, medoh: {min:1,max:25}, vert: {min:20,max:100}, s10m: {min:1.0,max:3.0}, s30m: {min:3.0,max:6.5}, triple: {min:4,max:14} };
   const targetConfigMap = effectiveConfigMap(currentUser.name);
   for (let key in fieldNamesMap) {
     if (payload[key] === "" || payload[key] === undefined) continue;
@@ -2279,17 +2214,17 @@ async function submitTargetSettings() {
 
 async function submitReport() {
   const w_pre = parseFloat(document.getElementById('f-weight').value) || ""; const bf_pre = parseFloat(document.getElementById('f-bf').value) || ""; const h_pre = parseFloat(document.getElementById('f-height').value) || "";
-  const prePayload = { height: h_pre, weight: w_pre, bf: bf_pre, bat: parseFloat(document.getElementById('f-bat').value) || "", pull: parseFloat(document.getElementById('f-pull').value) || "", b1: parseFloat(document.getElementById('f-b1').value) || "", s1: parseFloat(document.getElementById('f-s1').value) || "", d1: parseFloat(document.getElementById('f-d1').value) || "", chin: parseInt(document.getElementById('f-chin').value) || "", b10: parseFloat(document.getElementById('f-b10').value) || "", s10: parseFloat(document.getElementById('f-s10').value) || "", d10: parseFloat(document.getElementById('f-d10').value) || "", med: parseFloat(document.getElementById('f-med').value) || "", s10m: parseFloat(document.getElementById('f-10m').value) || "", s30m: parseFloat(document.getElementById('f-30m').value) || "", triple: parseFloat(document.getElementById('f-triple').value) || "" };
+  const prePayload = { height: h_pre, weight: w_pre, bf: bf_pre, bat: parseFloat(document.getElementById('f-bat').value) || "", pull: parseFloat(document.getElementById('f-pull').value) || "", b1: parseFloat(document.getElementById('f-b1').value) || "", s1: parseFloat(document.getElementById('f-s1').value) || "", b10: parseFloat(document.getElementById('f-b10').value) || "", s10: parseFloat(document.getElementById('f-s10').value) || "", med: parseFloat(document.getElementById('f-med').value) || "", medoh: parseFloat(document.getElementById('f-medoh').value) || "", vert: parseFloat(document.getElementById('f-vert').value) || "", s10m: parseFloat(document.getElementById('f-10m').value) || "", s30m: parseFloat(document.getElementById('f-30m').value) || "", triple: parseFloat(document.getElementById('f-triple').value) || "" };
   if (!validateFormInputs(prePayload)) return;
   const btn = document.getElementById('btn-submit'); btn.disabled = true; btn.textContent = '送信中...';
   let ffm = ""; let ffmi = ""; if(w_pre && bf_pre) { ffm = parseFloat((w_pre * (1 - bf_pre/100)).toFixed(2)); if(h_pre) ffmi = parseFloat((ffm / Math.pow(h_pre/100, 2)).toFixed(2)); }
-  const payload = { date: document.getElementById('f-date').value, name: currentUser.name, height: h_pre, weight: w_pre, bf: bf_pre, ffm: ffm, ffmi: ffmi, bat: prePayload.bat, pull: prePayload.pull, b1: prePayload.b1, s1: prePayload.s1, d1: prePayload.d1, chin: prePayload.chin, b10: prePayload.b10, s10: prePayload.s10, d10: prePayload.d10, med: prePayload.med, s10m: prePayload.s10m, s30m: prePayload.s30m, triple: prePayload.triple };
+  const payload = { date: document.getElementById('f-date').value, name: currentUser.name, height: h_pre, weight: w_pre, bf: bf_pre, ffm: ffm, ffmi: ffmi, bat: prePayload.bat, pull: prePayload.pull, b1: prePayload.b1, s1: prePayload.s1, b10: prePayload.b10, s10: prePayload.s10, med: prePayload.med, medoh: prePayload.medoh, vert: prePayload.vert, s10m: prePayload.s10m, s30m: prePayload.s30m, triple: prePayload.triple };
   try {
     const result = await postWithRetry({ action: 'report', payload: payload });
     if(result.ok || result.success) {
       let existingIdx = reportsData.findIndex(r => r.name === payload.name && r.date === payload.date);
       if (existingIdx !== -1) { for (let key in payload) { if (payload[key] !== "") reportsData[existingIdx][key] = payload[key]; } } else { reportsData.push(payload); }
-      const keys = ['height','weight','bf','ffm','ffmi','bat','pull','b1','s1','d1','chin','b10','s10','d10','med','s10m','s30m','triple'];
+      const keys = ['height','weight','bf','ffm','ffmi','bat','pull','b1','s1','b10','s10','med','medoh','vert','s10m','s30m','triple'];
       if(!allBestRecords[currentUser.name]) allBestRecords[currentUser.name] = {};
       keys.forEach(k => {
         let val = parseFloat(payload[k]); if(!isNaN(val)) {
@@ -2351,10 +2286,10 @@ async function submitOtherExReport() {
 }
 
 // 報告項目のID/ラベル一覧(出力チェックボックス・今日の報告詳細などで共有)
-const EXPORT_ITEMS = [{ id: 'height', label: '身長' }, { id: 'weight', label: '体重' }, { id: 'bf', label: '体脂肪率' }, { id: 'ffm', label: '除脂肪体重' }, { id: 'ffmi', label: '除脂肪指数' }, { id: 'bat', label: 'バットスピード' }, { id: 'pull', label: 'プルダウン' }, { id: 'b1', label: 'ベンチ1RM' }, { id: 's1', label: 'スクワット1RM' }, { id: 'd1', label: 'デッド1RM' }, { id: 'chin', label: '懸垂' }, { id: 'b10', label: 'ベンチ10RM' }, { id: 's10', label: 'スクワット10RM' }, { id: 'd10', label: 'デッド10RM' }, { id: 'med', label: 'メディシン投げ' }, { id: 's10m', label: '10m走' }, { id: 's30m', label: '30m走' }, { id: 'triple', label: '三段跳び' }];
+const EXPORT_ITEMS = [{ id: 'height', label: '身長' }, { id: 'weight', label: '体重' }, { id: 'bf', label: '体脂肪率' }, { id: 'ffm', label: '除脂肪体重' }, { id: 'ffmi', label: '除脂肪指数' }, { id: 'bat', label: 'バットスピード' }, { id: 'pull', label: 'プルダウン' }, { id: 'b1', label: 'ベンチ1RM' }, { id: 's1', label: 'スクワット1RM' }, { id: 'b10', label: 'ベンチ10RM' }, { id: 's10', label: 'スクワット10RM' }, { id: 'med', label: 'メディシンバックスロー' }, { id: 'medoh', label: 'メディシンオーバーヘッドスロー' }, { id: 'vert', label: '垂直跳び' }, { id: 's10m', label: '10m走' }, { id: 's30m', label: '30m走' }, { id: 'triple', label: '三段跳び(両足)' }];
 
 function buildExportCheckboxGrid() {
-  const items = [...EXPORT_ITEMS, { id: 'composite', label: '総合指数' }];
+  const items = EXPORT_ITEMS;
   const grid = document.getElementById('modal-chk-grid'); if (!grid) return;
   grid.innerHTML = items.map(item => `<label class="chk-item"><input type="checkbox" value="${item.id}" data-label="${item.label}" checked><span>${item.label}</span></label>`).join('');
 }
@@ -2383,15 +2318,10 @@ function executeCsvExport() {
   let csvHeaders = ['日付', '氏名'];
   selectedBoxes.forEach(box => csvHeaders.push(box.getAttribute('data-label')));
   let csvRows = [csvHeaders.join(',')];
-  const compositeScore = calcCompositeScore(targetName);
   myReports.forEach(r => {
     let rowData = [r.date, r.name];
     selectedBoxes.forEach(box => {
-      if (box.value === 'composite') {
-        rowData.push(compositeScore === null ? '' : compositeScore.toFixed(1));
-      } else {
-        rowData.push(formatExportValue(box.value, r[box.value]));
-      }
+      rowData.push(formatExportValue(box.value, r[box.value]));
     });
     csvRows.push(rowData.join(','));
   });
@@ -2422,11 +2352,8 @@ function executePdfExport() {
   myReports.sort((a,b) => new Date(a.date) - new Date(b.date));
   const selectedIds = selectedBoxes.map(b => b.value);
   const selectedLabels = selectedBoxes.map(b => b.getAttribute('data-label'));
-  const compositeScore = calcCompositeScore(targetName);
-  const compositeStr = compositeScore === null ? '-' : compositeScore.toFixed(1);
   const tableRows = myReports.map(r => {
     const cells = selectedIds.map(id => {
-      if (id === 'composite') return '<td>' + compositeStr + '</td>';
       const v = formatExportValue(id, r[id]);
       return '<td>' + (v !== '' ? v : '-') + '</td>';
     }).join('');
